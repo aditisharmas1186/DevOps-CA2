@@ -1,0 +1,161 @@
+---
+- name: Setup Prometheus and Grafana Monitoring
+  hosts: monitoring
+  become: yes
+  gather_facts: yes
+
+  vars:
+    prometheus_version: "2.45.0"
+    grafana_version: "latest"
+    node_exporter_version: "1.6.1"
+
+  tasks:
+    - name: Create prometheus user
+      user:
+        name: prometheus
+        shell: /bin/false
+        system: yes
+        create_home: no
+
+    - name: Create prometheus directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: "0755"
+      loop:
+        - /etc/prometheus
+        - /var/lib/prometheus
+
+    - name: Download Prometheus
+      get_url:
+        url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+        dest: /tmp/prometheus.tar.gz
+
+    - name: Extract Prometheus
+      unarchive:
+        src: /tmp/prometheus.tar.gz
+        dest: /tmp
+        remote_src: yes
+
+    - name: Copy Prometheus binaries
+      copy:
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
+        remote_src: yes
+        owner: prometheus
+        group: prometheus
+        mode: "0755"
+      loop:
+        - prometheus
+        - promtool
+
+    - name: Copy Prometheus config
+      copy:
+        dest: /etc/prometheus/prometheus.yml
+        content: |
+          global:
+            scrape_interval: 15s
+            evaluation_interval: 15s
+
+          scrape_configs:
+            - job_name: 'prometheus'
+              static_configs:
+                - targets: ['localhost:9090']
+
+            - job_name: 'devops-demo'
+              static_configs:
+                - targets: ['192.168.1.10:3000', '192.168.1.11:3000']
+              metrics_path: '/metrics'
+
+            - job_name: 'node-exporter'
+              static_configs:
+                - targets: ['192.168.1.10:9100', '192.168.1.11:9100']
+        owner: prometheus
+        group: prometheus
+        mode: "0644"
+
+    - name: Create Prometheus systemd service
+      copy:
+        dest: /etc/systemd/system/prometheus.service
+        content: |
+          [Unit]
+          Description=Prometheus
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          User=prometheus
+          Group=prometheus
+          Type=simple
+          ExecStart=/usr/local/bin/prometheus \
+            --config.file=/etc/prometheus/prometheus.yml \
+            --storage.tsdb.path=/var/lib/prometheus/ \
+            --web.console.templates=/etc/prometheus/consoles \
+            --web.console.libraries=/etc/prometheus/console_libraries
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: "0644"
+
+    - name: Start and enable Prometheus
+      systemd:
+        name: prometheus
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Add Grafana repository key
+      apt_key:
+        url: https://apt.grafana.com/gpg.key
+        state: present
+
+    - name: Add Grafana repository
+      apt_repository:
+        repo: "deb https://apt.grafana.com stable main"
+        state: present
+
+    - name: Install Grafana
+      apt:
+        name: grafana
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Grafana
+      systemd:
+        name: grafana-server
+        state: started
+        enabled: yes
+
+    - name: Configure firewall - Prometheus
+      ufw:
+        rule: allow
+        port: "9090"
+        proto: tcp
+
+    - name: Configure firewall - Grafana
+      ufw:
+        rule: allow
+        port: "3000"
+        proto: tcp
+
+    - name: Create Grafana datasource config
+      copy:
+        dest: /etc/grafana/provisioning/datasources/prometheus.yml
+        content: |
+          apiVersion: 1
+          datasources:
+            - name: Prometheus
+              type: prometheus
+              access: proxy
+              url: http://localhost:9090
+              isDefault: true
+        mode: "0644"
+      notify: Restart Grafana
+
+  handlers:
+    - name: Restart Grafana
+      systemd:
+        name: grafana-server
+        state: restarted

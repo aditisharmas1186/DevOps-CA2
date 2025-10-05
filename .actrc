@@ -1,0 +1,19 @@
+# act configuration file
+# This configures act to use appropriate Docker images for running GitHub Actions locally
+
+# Use medium-sized images for better compatibility
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+-P ubuntu-22.04=catthehacker/ubuntu:act-22.04
+-P ubuntu-20.04=catthehacker/ubuntu:act-20.04
+
+# Load environment variables from .env.act
+--env-file .env.act
+
+# Use GitHub API for better action compatibility (optional, requires GITHUB_TOKEN)
+# --use-gitignore
+
+# Verbose output for debugging
+# --verbose
+
+# Don't update Docker images automatically
+# --pull=false
