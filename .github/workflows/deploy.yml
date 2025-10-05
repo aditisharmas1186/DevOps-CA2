@@ -8,6 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DEPLOY_ENABLED: "false"   # set to "true" when you want Actions to deploy to a cluster
 
 jobs:
   build-and-deploy:
@@ -44,12 +45,16 @@ jobs:
           push: true
           tags: ${{ steps.prep.outputs.image }}:${{ steps.prep.outputs.tag }}
 
+      # --- K8s steps (SKIPPED while DEPLOY_ENABLED != 'true') ---
+
       - name: Setup kubectl
+        if: env.DEPLOY_ENABLED == 'true'
         uses: azure/setup-kubectl@v4
         with:
           version: "v1.30.0"
 
       - name: Configure kubeconfig
+        if: env.DEPLOY_ENABLED == 'true'
         shell: bash
         run: |
           mkdir -p "$HOME/.kube"
@@ -57,6 +62,7 @@ jobs:
           chmod 600 "$HOME/.kube/config"
 
       - name: Render manifests (inject image tag)
+        if: env.DEPLOY_ENABLED == 'true'
         shell: bash
         run: |
           mkdir -p k8s/rendered
@@ -64,6 +70,7 @@ jobs:
             k8s/deployment.yaml > k8s/rendered/deployment.yaml
 
       - name: Apply Kubernetes manifests
+        if: env.DEPLOY_ENABLED == 'true'
         shell: bash
         run: |
           kubectl apply -f k8s/namespace.yaml
@@ -71,7 +78,7 @@ jobs:
           kubectl apply -f k8s/service.yaml
 
       - name: Verify rollout status
+        if: env.DEPLOY_ENABLED == 'true'
         shell: bash
         run: |
-          kubectl -n nemotron rollout status deploy/nemotron-frontend --timeout=180s
-          kubectl -n nemotron get deploy,pods,svc
+          kubectl -n nemotron r
