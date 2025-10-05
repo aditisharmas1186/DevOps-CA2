@@ -1,13 +1,13 @@
-name: CI-CD
+name: All Tasks Completed: Github CI/CD+ K8s+ IaC + Prometheus + Grafana
 
 on:
   push:
-    branches: [ main ]
+    branches: [ Group11, main ]
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{{{ github.repository }}}}
+  IMAGE_NAME: ${{ github.repository }} # owner/repo (we'll lowercase it)
 
 jobs:
   build-and-deploy:
@@ -15,30 +15,32 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare image name (lowercase)
+        id: prep
+        run: |
+          IMAGE_LC="$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')"
+          TAG="${GITHUB_REF_NAME}-${GITHUB_SHA::7}"
+          echo "image=${IMAGE_LC}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Full image: ${IMAGE_LC}:${TAG}"
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ${{{{ env.REGISTRY }}}}
-          username: ${{{{ github.actor }}}}
-          password: ${{{{ secrets.GITHUB_TOKEN }}}}
-
-      - name: Extract image tag
-        id: vars
-        run: |
-          SHA="${{{{ github.sha }}}}"
-          echo "tag=${{ github.ref_name }}-${SHA:0:7}" >> $GITHUB_OUTPUT
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: ${{{{ env.REGISTRY }}}}/${{{{{ env.IMAGE_NAME }}}}}:${{{{ steps.vars.outputs.tag }}}}
+          tags: ${{ steps.prep.outputs.image }}:${{ steps.prep.outputs.tag }}
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v4
@@ -47,19 +49,24 @@ jobs:
 
       - name: Configure kubeconfig
         run: |
-          echo "${{{{ secrets.KUBECONFIG_DATA }}}}" | base64 -d > $HOME/.kube/config
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      - name: Render manifests (set image tag)
+      # Render deployment with the newly built image (write to a temp file)
+      - name: Render manifests (inject image tag)
         run: |
-          sed -i "s|REPLACE_IMAGE|${{{{ env.REGISTRY }}}}/${{{{{ env.IMAGE_NAME }}}}}:${{{{ steps.vars.outputs.tag }}}}|g" k8s/deployment.yaml
+          mkdir -p k8s/rendered
+          sed "s|REPLACE_IMAGE|${{ steps.prep.outputs.image }}:${{ steps.prep.outputs.tag }}|g" \
+            k8s/deployment.yaml > k8s/rendered/deployment.yaml
 
       - name: Apply manifests
         run: |
           kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/rendered/deployment.yaml
           kubectl apply -f k8s/service.yaml
 
       - name: Show rollout status
         run: |
           kubectl -n nemotron rollout status deploy/nemotron-frontend --timeout=180s
+          kubectl -n nemotron get deploy,pods,svc
