@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+langchain>=0.1.0
+langgraph
+langchain-openai
+langchain-google-genai
+pydantic
+python-dotenv
+httpx
+numpy<2.0
+pytest
+pytest-asyncio 

@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tutor-orchestrator
+  namespace: tutor-orchestrator
+  labels:
+    app: autonomous-tutor-orchestrator
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: autonomous-tutor-orchestrator
+  template:
+    metadata:
+      labels:
+        app: autonomous-tutor-orchestrator
+    spec:
+      containers:
+      - name: tutor-orchestrator
+        image: pranshugupta111/ai-tutor-orchestrator:latest
+        ports:
+        - containerPort: 8000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: tutor-orchestrator-config
+        - secretRef:
+            name: tutor-orchestrator-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: dockerhub-secret

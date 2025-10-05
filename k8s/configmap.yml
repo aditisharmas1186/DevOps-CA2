@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tutor-orchestrator-config
+  namespace: tutor-orchestrator
+  labels:
+    app: autonomous-tutor-orchestrator
+data:
+  APP_NAME: "autonomous-tutor-orchestrator"
+  APP_ENV: "production"
+  APP_PORT: "8000"
+  LOG_LEVEL: "INFO"
+  # Add your actual Google API key here
+  # GOOGLE_API_KEY: "your_actual_api_key_here"
