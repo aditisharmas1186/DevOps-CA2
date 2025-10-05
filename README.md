@@ -1,50 +1,70 @@
-# DevOps-CA2
-https://docs.google.com/spreadsheets/d/1Ue8fnlwFuGK7n4ExS3y642HUqeFyhsYikHqtKnFWu38/edit?gid=0#gid=0
-tudents are allowed to create max 4 students groups. Find out any bug/issue/ hackathon challenge/ Kaggle challenge/ open source challenge/ Linux foundation challenge.  (8)
-fill the below excel sheet-
-https://docs.google.com/spreadsheets/d/1Ue8fnlwFuGK7n4ExS3y642HUqeFyhsYikHqtKnFWu38/edit?gid=0#gid=0
-Students Group, who has filled the sheet first they have been assigned those problem statement and no other group is allowed to choose the same problem statement. Fill this sheet before 15th Sep 2025.
-After competition, students need to push their repo in github : https://github.com/aditisharmas1186/Devops-CA2 by 5th October 2025.
+# 🚀 DevOps CA2 – Group 11  
+**Submitted by:** Aryan Malkani, Himani Arora, Yogita Beniwal, Gargi Mittal  
 
-Task
+---
 
-Description
+## 🧠 **Overview**
+This project demonstrates a complete DevOps pipeline including:
+1. **CI/CD with GitHub Actions**
+2. **Configuration Management using Ansible**
+3. **Containerization & Deployment using Docker + Kubernetes**
+4. **Monitoring using Prometheus and Grafana**
 
-Marks
+---
 
-Task 1 – Deployment Strategy
+## ⚙️ **Task 1 – GitHub Actions CI/CD**
+- Implemented automated CI/CD using GitHub Actions workflow.  
+- Each push triggers build, test, and deployment stages.  
+- Docker image is automatically built and pushed to **GitHub Container Registry**.
 
-Select one deployment tool (GitHub Actions / Codefresh / Harness / Spinnaker / etc.) and prepare a working pipeline for a simple service (ANY PBL OR BTECH PROJECT). Submit workflow file & pipeline diagram.
+🖼️ *Screenshot:*  
+`images_of_tasks/task_1_githubactions.jpeg`
 
-1
+---
 
-Task 2 – Configuration Management & IaC
+## 🧩 **Task 2 – Ansible Configuration Management**
+- Created **inventory.ini** and **site.yml** for provisioning environments.  
+- Automated dependency installation and Docker setup.
 
-Use Ansible or Puppet to configure the runtime environment (install packages, create users, manage files). Upload your Playbook/Manifest & inventory.
+🖼️ *Screenshot:*  
+`images_of_tasks/task_2_ansible.jpeg`
 
-2
+---
 
-Task 3 – Containerization & Orchestration
+## 🐳 **Task 3 – Dockerization & Kubernetes Deployment**
+- Dockerized the project using a custom `Dockerfile`.  
+- Built and pushed image to GitHub Packages.  
+- Deployed on Kubernetes using `namespace.yaml`, `deployment.yaml`, and `service.yaml`.
 
-Dockerize your service, create Kubernetes manifests (Deployment, Service). Demonstrate rolling updates & rollback. Provide YAMLs & screenshots.
+🖼️ *Screenshots:*  
+- Docker Build and Push → `images_of_tasks/task_3_dockerize.jpeg`  
+- Kubernetes Pods Running → `images_of_tasks/task_3_kubernetes_working.jpeg`  
+- Image on GitHub Packages → `images_of_tasks/task_3_packages_from_github_for_docker.jpeg`
 
-1.5
+---
 
-Task 4 – Monitoring & Logging
+## 📊 **Task 4 – Monitoring with Prometheus & Grafana**
+- Installed Prometheus and Grafana using Helm charts.  
+- Verified Prometheus scrape targets (status: **UP**)  
+- Imported Grafana dashboards to monitor uptime, latency, and resource usage.
 
-Install Prometheus + Grafana (or Nagios). Expose app metrics & create a basic dashboard (uptime, latency, error rate). Upload dashboard screenshots.
+🖼️ *Screenshots:*  
+- Installation commands → `images_of_tasks/task_4_commands_to_install_grafana_prometheus.jpeg`  
+- Prometheus Targets → `images_of_tasks/task_4_prometheus.jpeg`  
+- Grafana Dashboard → `images_of_tasks/task_4_grafana.jpeg`
 
-2
+---
 
-Task 5 – Reflection & Report
+## 🧠 **Conclusion**
+All components (CI/CD, Ansible, Docker, Kubernetes, Prometheus, Grafana) are successfully integrated and verified.  
+The pipeline demonstrates **end-to-end automation, containerized deployment, and real-time monitoring** in a DevOps environment.
 
-4–5 slides: Architecture, pipeline flow, challenges, lessons learned. Documentation ( Architecture, pipeline flow, challenges, lessons learned)
+---
 
-1.5
+## 💻 **Commands Summary**
 
-Bonus 
-
-Participate in an external DevOps challenge (Kaggle/Devpost/Cloud hackathon). Attach proof of submission/leaderboard or GitHub PR badge.
-
-
-
+### Deploy App on Kubernetes
+```bash
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
