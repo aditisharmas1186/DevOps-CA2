@@ -1,13 +1,77 @@
-name: sanity
+name: CI-CD Pipeline
 
 on:
   push:
     branches: ["Group11", "main"]
   workflow_dispatch: {}
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  echo:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - name: Say hi
-        run: echo "YAML is parsing fine"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare image variables
+        id: prep
+        shell: bash
+        run: |
+          IMAGE_LC="$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')"
+          TAG="${GITHUB_REF_NAME}-${GITHUB_SHA::7}"
+          echo "image=${IMAGE_LC}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Full image tag: ${IMAGE_LC}:${TAG}"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.prep.outputs.image }}:${{ steps.prep.outputs.tag }}
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.30.0"
+
+      - name: Configure kubeconfig
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Render manifests (inject image tag)
+        shell: bash
+        run: |
+          mkdir -p k8s/rendered
+          sed "s|REPLACE_IMAGE|${{ steps.prep.outputs.image }}:${{ steps.prep.outputs.tag }}|g" \
+            k8s/deployment.yaml > k8s/rendered/deployment.yaml
+
+      - name: Apply Kubernetes manifests
+        shell: bash
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/rendered/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Verify rollout status
+        shell: bash
+        run: |
+          kubectl -n nemotron rollout status deploy/nemotron-frontend --timeout=180s
+          kubectl -n nemotron get deploy,pods,svc
