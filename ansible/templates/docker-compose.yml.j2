@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  tutor-orchestrator:
+    image: {{ docker_image }}
+    container_name: tutor-orchestrator
+    ports:
+      - "{{ app_port }}:8000"
+    environment:
+      - APP_ENV=production
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Redis for caching (uncomment if needed)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: tutor-redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   restart: unless-stopped
+
+  # Optional: PostgreSQL database (uncomment if needed)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: tutor-postgres
+  #   environment:
+  #     POSTGRES_DB: tutorapp
+  #     POSTGRES_USER: tutoruser
+  #     POSTGRES_PASSWORD: your_secure_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+
+# Optional: Named volumes for data persistence (uncomment if using databases)
+# volumes:
+#   redis_data:
+#   postgres_data:

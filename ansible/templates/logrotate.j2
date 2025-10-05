@@ -1,0 +1,12 @@
+{{ app_directory }}/logs/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    create 644 {{ app_user }} {{ app_group }}
+    postrotate
+        systemctl reload tutor-orchestrator.service
+    endscript
+}
