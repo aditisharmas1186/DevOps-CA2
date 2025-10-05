@@ -1,0 +1,22 @@
+services:
+  notes_reactapp:
+    container_name: notes_reactapp
+    image: reactapp:1.0.0
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - notes_goapp
+
+  notes_goapp:
+    container_name: notes_goapp
+    image: goapp:1.0.0
+    build:
+      context: ./backend
+      dockerfile: go.dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      DATABASE_URL: "postgresql://postgres.qzutdqrlfijhslnbqosw:database%40PASSWORD123@aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require"
