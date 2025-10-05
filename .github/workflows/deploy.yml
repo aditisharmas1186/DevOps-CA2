@@ -1,13 +1,13 @@
-name: All Tasks Completed: Github CI/CD+ K8s+ IaC + Prometheus + Grafana
+name: CI-CD Pipeline: GitHub Actions + K8s + Prometheus + Grafana
 
 on:
   push:
-    branches: [ Group11, main ]
+    branches: [Group11, main]
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }} # owner/repo (we'll lowercase it)
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-deploy:
@@ -15,27 +15,28 @@ jobs:
     permissions:
       contents: read
       packages: write
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare image name (lowercase)
+      - name: Prepare image variables
         id: prep
         run: |
           IMAGE_LC="$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')"
           TAG="${GITHUB_REF_NAME}-${GITHUB_SHA::7}"
           echo "image=${IMAGE_LC}" >> $GITHUB_OUTPUT
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
-          echo "Full image: ${IMAGE_LC}:${TAG}"
+          echo "Full image tag: ${IMAGE_LC}:${TAG}"
 
-      - name: Log in to GHCR
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push image
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -53,20 +54,19 @@ jobs:
           echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      # Render deployment with the newly built image (write to a temp file)
       - name: Render manifests (inject image tag)
         run: |
           mkdir -p k8s/rendered
           sed "s|REPLACE_IMAGE|${{ steps.prep.outputs.image }}:${{ steps.prep.outputs.tag }}|g" \
             k8s/deployment.yaml > k8s/rendered/deployment.yaml
 
-      - name: Apply manifests
+      - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/rendered/deployment.yaml
           kubectl apply -f k8s/service.yaml
 
-      - name: Show rollout status
+      - name: Verify rollout status
         run: |
           kubectl -n nemotron rollout status deploy/nemotron-frontend --timeout=180s
           kubectl -n nemotron get deploy,pods,svc
