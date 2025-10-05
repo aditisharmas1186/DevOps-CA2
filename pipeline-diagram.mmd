@@ -1,0 +1,9 @@
+flowchart LR
+  A[Push to main] --> B[GitHub Actions: Checkout]
+  B --> C[Login to GHCR]
+  C --> D[Build & Push Docker Image]
+  D --> E[Setup kubectl]
+  E --> F[Write kubeconfig from secret]
+  F --> G[sed: inject image tag in manifests]
+  G --> H[kubectl apply: namespace, deployment, service]
+  H --> I[Rollout status check]

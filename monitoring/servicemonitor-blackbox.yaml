@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nemotron-blackbox
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  endpoints:
+    - interval: 30s
+      scrapeTimeout: 10s
+      port: http
+      path: /probe
+      params:
+        module: [http_2xx]
+        target: ["http://nemotron-frontend.nemotron.svc.cluster.local/"]
+      relabelings:
+        - sourceLabels: [__param_target]
+          targetLabel: instance
+        - targetLabel: __address__
+          replacement: blackbox-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+  selector:
+    matchLabels:
+      app: nemotron-frontend
+  namespaceSelector:
+    matchNames: ["nemotron"]
