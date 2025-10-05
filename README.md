@@ -1,5 +1,5 @@
 # 🚀 DevOps CA2 – Group 11  
-**Submitted by:** Aryan Malkani, Himani Arora, Yogita Beniwal, Gargi Mittal  
+**Submitted by:** Aryan Malkani, Gautam Rajhans, Yogita Beniwal, Gargi Mittal  
 
 ---
 
