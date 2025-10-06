@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: businesslens-web
+  namespace: businesslens
+  labels:
+    app: businesslens
+spec:
+  selector:
+    app: businesslens
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP

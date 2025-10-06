@@ -1,0 +1,162 @@
+---
+- name: Install common requirements
+  hosts: all
+  become: yes
+  tags: ["common"]
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install common packages
+      apt:
+        name:
+          - git
+          - curl
+          - build-essential
+          - python3-pip
+          - ufw
+          - fail2ban
+        state: present
+
+    - name: Configure UFW
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop: "{{ firewall_allowed_ports }}"
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        policy: deny
+
+- name: Configure and deploy web application
+  hosts: web
+  become: yes
+  tags: ["web", "deploy"]
+  tasks:
+    - name: Install Node.js repository
+      shell: |
+        curl -fsSL https://deb.nodesource.com/setup_{{ node_version }} | sudo -E bash -
+      args:
+        warn: false
+
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
+        update_cache: yes
+
+    - name: Install PM2 globally
+      npm:
+        name: pm2
+        global: yes
+        state: present
+
+    - name: Create application directory
+      file:
+        path: "/var/www/{{ app_name }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0755"
+
+    - name: Clone/Update application repository
+      git:
+        repo: "https://github.com/himani080/BusinessLens.git"
+        dest: "/var/www/{{ app_name }}"
+        version: main
+        force: yes
+
+    - name: Install application dependencies
+      npm:
+        path: "/var/www/{{ app_name }}"
+        state: present
+        ci: yes
+
+    - name: Create environment file
+      template:
+        src: templates/env.j2
+        dest: "/var/www/{{ app_name }}/.env"
+        mode: "0600"
+
+    - name: Start application with PM2
+      shell: |
+        cd /var/www/{{ app_name }} && \
+        pm2 delete {{ app_name }} || true && \
+        pm2 start server/server.js --name {{ app_name }} \
+        --max-memory-restart {{ app_memory_limit }} \
+        -- --port {{ app_port }}
+      become: yes
+      become_user: "{{ ansible_user }}"
+
+- name: Configure MongoDB servers
+  hosts: database
+  become: yes
+  tags: ["database"]
+  tasks:
+    - name: Import MongoDB public key
+      apt_key:
+        url: https://www.mongodb.org/static/pgp/server-{{ mongodb_version }}.asc
+        state: present
+
+    - name: Add MongoDB repository
+      apt_repository:
+        repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/{{ mongodb_version }} multiverse"
+        state: present
+        filename: mongodb-org-{{ mongodb_version }}
+
+    - name: Install MongoDB
+      apt:
+        name: mongodb-org
+        state: present
+        update_cache: yes
+
+    - name: Configure MongoDB
+      template:
+        src: templates/mongod.conf.j2
+        dest: /etc/mongod.conf
+        mode: "0644"
+      notify: restart mongodb
+
+    - name: Start and enable MongoDB service
+      service:
+        name: mongod
+        state: started
+        enabled: yes
+
+- name: Configure Redis servers
+  hosts: cache
+  become: yes
+  tags: ["cache"]
+  tasks:
+    - name: Install Redis
+      apt:
+        name: redis-server
+        state: present
+
+    - name: Configure Redis
+      template:
+        src: templates/redis.conf.j2
+        dest: /etc/redis/redis.conf
+        mode: "0644"
+      notify: restart redis
+
+    - name: Start and enable Redis service
+      service:
+        name: redis-server
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: restart mongodb
+      service:
+        name: mongod
+        state: restarted
+
+    - name: restart redis
+      service:
+        name: redis-server
+        state: restarted

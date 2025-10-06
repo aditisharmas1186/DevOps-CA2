@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: businesslens-monitor
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: businesslens
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

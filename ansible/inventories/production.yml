@@ -1,0 +1,66 @@
+---
+all:
+  children:
+    production:
+      children:
+        web:
+          hosts:
+            web1:
+              ansible_host: 10.0.1.10
+              ansible_user: ubuntu
+            web2:
+              ansible_host: 10.0.1.11
+              ansible_user: ubuntu
+        database:
+          hosts:
+            mongodb1:
+              ansible_host: 10.0.2.10
+              ansible_user: ubuntu
+            mongodb2:
+              ansible_host: 10.0.2.11
+              ansible_user: ubuntu
+        cache:
+          hosts:
+            redis1:
+              ansible_host: 10.0.3.10
+              ansible_user: ubuntu
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    app_name: businesslens
+    app_environment: production
+    node_version: 16.x
+    mongodb_version: "5.0"
+    enable_ssl: true
+    domain_name: businesslens.com
+
+    # Application specific variables
+    app_port: 3000
+    mongodb_port: 27017
+    redis_port: 6379
+
+    # Monitoring and logging
+    enable_monitoring: true
+    enable_backup: true
+
+    # Security
+    firewall_allowed_ports:
+      - 22 # SSH
+      - 80 # HTTP
+      - 443 # HTTPS
+      - 3000 # Application
+      - 27017 # MongoDB
+
+    # Backup configuration
+    backup_retention_days: 7
+    backup_time: "0 2 * * *" # Every day at 2 AM
+
+    # SSL/TLS configuration
+    ssl_email: admin@businesslens.com
+
+    # Application scaling
+    min_instances: 2
+    max_instances: 4
+
+    # Resource limits
+    app_memory_limit: "1G"
+    app_cpu_limit: "1"

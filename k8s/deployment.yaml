@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: businesslens-web
+  namespace: businesslens
+  labels:
+    app: businesslens
+    tier: frontend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: businesslens
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: businesslens
+        tier: frontend
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '3000'
+    spec:
+      containers:
+        - name: businesslens-web
+          image: nginx:1.25.2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: businesslens-config
+                  key: NODE_ENV
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: businesslens-secrets
+                  key: MONGODB_URI
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: businesslens-secrets
+                  key: REDIS_URL
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/server/uploads
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: businesslens-uploads-pvc

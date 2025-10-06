@@ -1,0 +1,56 @@
+---
+all:
+  children:
+    staging:
+      children:
+        web:
+          hosts:
+            web-staging:
+              ansible_host: 10.0.10.10
+              ansible_user: ubuntu
+        database:
+          hosts:
+            mongodb-staging:
+              ansible_host: 10.0.20.10
+              ansible_user: ubuntu
+        cache:
+          hosts:
+            redis-staging:
+              ansible_host: 10.0.30.10
+              ansible_user: ubuntu
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    app_name: businesslens
+    app_environment: staging
+    node_version: 16.x
+    mongodb_version: "5.0"
+    enable_ssl: false
+    domain_name: staging.businesslens.com
+
+    # Application specific variables
+    app_port: 3000
+    mongodb_port: 27017
+    redis_port: 6379
+
+    # Monitoring and logging
+    enable_monitoring: true
+    enable_backup: false
+
+    # Security
+    firewall_allowed_ports:
+      - 22 # SSH
+      - 80 # HTTP
+      - 3000 # Application
+      - 27017 # MongoDB
+
+    # Application scaling
+    min_instances: 1
+    max_instances: 2
+
+    # Resource limits
+    app_memory_limit: "512M"
+    app_cpu_limit: "0.5"
+
+    # Development settings
+    enable_debug: true
+    verbose_logging: true
