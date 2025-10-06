@@ -1,0 +1,28 @@
+---
+- hosts: all
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Ensure Homebrew is installed
+      command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      args:
+        creates: /opt/homebrew/bin/brew
+
+    - name: Install Python3 and Node using Homebrew
+      homebrew:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python
+        - node
+
+    - name: Create project directory
+      file:
+        path: ~/Desktop/college/devops/Rasoi-Genie
+        state: directory
+
+    - name: Create a venv folder for backend
+      command: python3 -m venv ~/Desktop/college/devops/Rasoi-Genie/backend/venv
+      args:
+        creates: ~/Desktop/college/devops/Rasoi-Genie/backend/venv

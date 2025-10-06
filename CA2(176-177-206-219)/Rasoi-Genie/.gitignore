@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.env
+.venv
+env/
+venv/
+ENV/
+*.sqlite3
+*.db
+*.log
+
+# VS Code
+.vscode/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# Pytest
+.pytest_cache/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/.cache/
+frontend/.turbo/
+
+# Tailwind
+frontend/tailwind.css
+
+# Environment files
+*.env
+*.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.swp
