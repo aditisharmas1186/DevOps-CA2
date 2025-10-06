@@ -1,0 +1,26 @@
+---
+- name: Install application dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - python3
+    - python3-pip
+    - docker.io
+    - libgl1
+    - ffmpeg
+
+- name: Ensure application directory exists
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+
+- name: Deploy application code
+  copy:
+    src: "../../../microplastic-classifier/"
+    dest: "{{ app_dir }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+  notify: restart microplastic app

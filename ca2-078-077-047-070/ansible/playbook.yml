@@ -1,0 +1,85 @@
+---
+- name: Configure Microplastic Detection App Server
+  hosts: microplastic-app
+  become: yes
+  vars:
+    app_user: "microplastic-app"
+    app_dir: "/opt/microplastic-detector"
+    app_port: 8501
+
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install system dependencies
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+          - docker.io
+          - docker-compose
+          - nginx
+          - libgl1
+          - ffmpeg
+        state: present
+      notify: restart docker
+
+    - name: Ensure docker service is started and enabled
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create application user
+      user:
+        name: "{{ app_user }}"
+        system: yes
+        create_home: yes
+        shell: /bin/bash
+
+    - name: Add user to docker group
+      user:
+        name: "{{ app_user }}"
+        groups: docker
+        append: yes
+
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+
+    - name: Copy application code
+      copy:
+        src: "../microplastic-classifier/"
+        dest: "{{ app_dir }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+      notify: restart microplastic app
+
+    - name: Install Python requirements
+      pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        executable: pip3
+      notify: restart microplastic app
+
+    - name: Create systemd service file
+      template:
+        src: app.service.j2
+        dest: /etc/systemd/system/microplastic-app.service
+      notify: reload systemd
+
+    - name: Enable and start microplastic app service
+      systemd:
+        name: microplastic-app
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+  handlers:
+    - include: roles/microplastic-app/handlers/main.yml
