@@ -1,0 +1,55 @@
+{
+  "title": "Nemotron Frontend - Uptime & Latency",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Uptime (probe_success)",
+      "targets": [
+        {
+          "expr": "avg_over_time(probe_success[5m])"
+        }
+      ],
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 6
+      }
+    },
+    {
+      "type": "graph",
+      "title": "HTTP Latency (p50)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum(rate(probe_http_duration_seconds_bucket[5m])) by (le))"
+        }
+      ],
+      "id": 2,
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 16,
+        "h": 6
+      }
+    },
+    {
+      "type": "graph",
+      "title": "HTTP Errors (non-2xx)",
+      "targets": [
+        {
+          "expr": "sum(rate(probe_http_status_code{status_code!~\"2..\"}[5m]))"
+        }
+      ],
+      "id": 3,
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 24,
+        "h": 8
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

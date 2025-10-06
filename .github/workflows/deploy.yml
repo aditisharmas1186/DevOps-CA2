@@ -1,0 +1,84 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches: ["Group11", "main"]
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  DEPLOY_ENABLED: "false"   # set to "true" when you want Actions to deploy to a cluster
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare image variables
+        id: prep
+        shell: bash
+        run: |
+          IMAGE_LC="$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')"
+          TAG="${GITHUB_REF_NAME}-${GITHUB_SHA::7}"
+          echo "image=${IMAGE_LC}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Full image tag: ${IMAGE_LC}:${TAG}"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.prep.outputs.image }}:${{ steps.prep.outputs.tag }}
+
+      # --- K8s steps (SKIPPED while DEPLOY_ENABLED != 'true') ---
+
+      - name: Setup kubectl
+        if: env.DEPLOY_ENABLED == 'true'
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.30.0"
+
+      - name: Configure kubeconfig
+        if: env.DEPLOY_ENABLED == 'true'
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Render manifests (inject image tag)
+        if: env.DEPLOY_ENABLED == 'true'
+        shell: bash
+        run: |
+          mkdir -p k8s/rendered
+          sed "s|REPLACE_IMAGE|${{ steps.prep.outputs.image }}:${{ steps.prep.outputs.tag }}|g" \
+            k8s/deployment.yaml > k8s/rendered/deployment.yaml
+
+      - name: Apply Kubernetes manifests
+        if: env.DEPLOY_ENABLED == 'true'
+        shell: bash
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/rendered/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Verify rollout status
+        if: env.DEPLOY_ENABLED == 'true'
+        shell: bash
+        run: |
+          kubectl -n nemotron r
