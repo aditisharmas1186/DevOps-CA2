@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Todo App
 
 A simple dockerized todo application with React frontend, Node.js backend, and MongoDB database.
@@ -107,3 +108,6 @@ npm run dev
 - **Server**: Node.js Express API with Mongoose ODM
 - **Database**: MongoDB for data persistence
 - **Networking**: All services communicate through a Docker bridge network
+=======
+# CA2-507-508
+>>>>>>> 608717e (Initial commit)
