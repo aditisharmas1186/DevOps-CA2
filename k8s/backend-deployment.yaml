@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ehr-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ehr-backend
+  template:
+    metadata:
+      labels:
+        app: ehr-backend
+    spec:
+      containers:
+        - name: ehr-backend
+          image: madhuraaher0547/ehr-backend:latest   # 👈 use your Docker Hub image name
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MONGO_URL
+              value: mongodb://mongo:27017/wellnest

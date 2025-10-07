@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ehr-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ehr-frontend
+  template:
+    metadata:
+      labels:
+        app: ehr-frontend
+    spec:
+      containers:
+        - name: ehr-frontend
+          image: madhuraaher0547/ehr-frontend:latest   # 👈 use your Docker Hub image name
+          ports:
+            - containerPort: 80
