@@ -59,7 +59,7 @@ The system is built using **Node.js, MongoDB, Docker, Kubernetes, Prometheus, Gr
 ## Setup and Deployment  
 
 ### 1. Clone the Repository
-git clone https://github.com/🟩your-username/CA2-507-508.git
+git clone https://github.com/Madhura777/CA2-507-508-514.git
 cd CA2-507-508
 
 ### 2. Build and Push Docker Images 
@@ -94,13 +94,47 @@ Memory Usage
 HTTP Request Count
 Uptime and Response Time
 
-### 6. Automation
+### 7. Automation
 Ansible
 Used to install Docker, clone repo, and run containers automatically.
 ansible-playbook -i inventory.ini playbook.yml --ask-become-pass
 
-### 6. GitHub Actions
+### 8. GitHub Actions
 Workflow .github/workflows/docker.yml builds and pushes Docker images to Docker Hub whenever code is pushed to main.
+
+---
+---
+
+## Screenshots
+| Description | Screenshot |
+|--------------|-------------|
+| **Architecture Diagram** | ![Architecture](DevOps%20SS/Architecture%20Diagram.png) |
+| **CI/CD Pipeline Flow** | ![Pipeline](DevOps%20SS/CI:CD%20Pipeline%20Flow.png) |
+| **Prometheus Target UP** | ![Prometheus](DevOps%20SS/Prometheus%20target%20UP.png) |
+| **Grafana Dashboard** | ![Grafana](DevOps%20SS/Grafana%20Dashboard.png) |
+| **Frontend UI** | ![Frontend](DevOps%20SS/EHR1.png) |
+
+
+## Challenges Faced
+- **Kubernetes Networking & MongoDB Connectivity:** Initial difficulty with service DNS resolution and environment variables.  
+- **Prometheus Target Discovery Errors:** Adjusted job names and full DNS to resolve metrics scraping issues.  
+- **CI/CD Authentication Issues:** Encountered Docker Hub token errors during automated pushes.  
+
+---
+
+## Learnings & Outcomes
+- Hands-on understanding of the **complete DevOps lifecycle** — from development to deployment.  
+- Mastered **CI/CD pipelines, container orchestration, and monitoring** in real-world workflow.  
+- Learned to **debug and integrate** multiple tools like Docker, Kubernetes, and Prometheus cohesively.
+
+---
+
+## Contributors
+- **Madhura Aher (23070122507)**
+- **Mayank Verma (23070122508)**
+- **Suyash Jagtap (23070122514)**
+  
+
 
  
 
