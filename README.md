@@ -1,113 +1,62 @@
-<<<<<<< HEAD
-# Todo App
 
-A simple dockerized todo application with React frontend, Node.js backend, and MongoDB database.
+# 🏥 Electronic Health Record (EHR) System  
+*A Containerized, Monitored, and Automated Healthcare Application*
 
-## Features
+---
 
-- Add new todos
-- View all todos
-- Mark todos as complete/incomplete
-- Delete todos
-- Fully dockerized with Docker Compose
+## 📖 Overview  
+This project implements a **cloud-native Electronic Health Record (EHR)** system that securely manages patient data and appointments.  
+The system is built using **Node.js, MongoDB, Docker, Kubernetes, Prometheus, Grafana, Ansible, and GitHub Actions**, showcasing a full DevOps lifecycle — from CI/CD to infrastructure automation and monitoring.
 
-## API Endpoints
+---
 
-- `GET /api/todos` - Get all todos
-- `POST /api/todos` - Add a new todo
-- `POST /api/todos/delete` - Delete a todo
-- `POST /api/todos/modify` - Modify/update a todo
+## 🚀 Features  
 
-## Quick Start
+- **Frontend (EHR Web UI)** – Built with HTML/CSS/JS, accessible via NodePort service.  
+- **Backend (Express.js API)** – Handles patient and appointment data with REST APIs.  
+- **Database (MongoDB)** – Stores patient and appointment records persistently.  
+- **Containerization (Docker)** – Each component runs in isolated containers.  
+- **Orchestration (Kubernetes)** – Deploys and scales the application automatically.  
+- **Automation (Ansible)** – Automates environment setup and deployment.  
+- **CI/CD (GitHub Actions)** – Builds and pushes Docker images automatically.  
+- **Monitoring (Prometheus + Grafana)** – Collects metrics and visualizes application health.
 
-1. Make sure you have Docker and Docker Compose installed
-2. Clone this repository
-3. Run the application:
+---
 
-```bash
-docker-compose up --build
-```
+## 🧱 Project Architecture  
 
-4. Access the application:
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-   - MongoDB: mongodb://localhost:27017
+![Architecture Diagram](docs/architecture.png)  
+> *System flow showing how users interact with the frontend, backend, and monitoring stack.*
 
-## Testing with Postman
+### 🔹 Key Components
+| Component | Description |
+|------------|--------------|
+| **Frontend Service** | User interface for patient and appointment management |
+| **Backend Service** | REST API built with Express.js |
+| **MongoDB Service** | Database for persistent data storage |
+| **Prometheus** | Metrics collection from backend |
+| **Grafana** | Visualization dashboard for monitoring |
+| **Ansible** | Environment provisioning and setup |
+| **GitHub Actions** | CI/CD automation for build and deploy |
 
-You can test the API endpoints directly using Postman:
+---
 
-### Get all todos
-```
-GET http://localhost:5000/api/todos
-```
+## ⚙️ Tech Stack  
 
-### Add a new todo
-```
-POST http://localhost:5000/api/todos
-Content-Type: application/json
+| Category | Technologies |
+|-----------|---------------|
+| **Frontend** | HTML, CSS, JavaScript |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB |
+| **Containerization** | Docker |
+| **Orchestration** | Kubernetes (Minikube) |
+| **Monitoring** | Prometheus, Grafana |
+| **Automation** | Ansible |
+| **CI/CD** | GitHub Actions |
+| **Version Control** | Git + GitHub |
 
-{
-  "title": "Learn Docker",
-  "description": "Complete the Docker tutorial"
-}
-```
+---
 
-### Delete a todo
-```
-POST http://localhost:5000/api/todos/delete
-Content-Type: application/json
+## 🧩 Project Structure  
 
-{
-  "id": "todo_id_here"
-}
-```
-
-### Modify a todo
-```
-POST http://localhost:5000/api/todos/modify
-Content-Type: application/json
-
-{
-  "id": "todo_id_here",
-  "title": "Updated title",
-  "description": "Updated description",
-  "completed": true
-}
-```
-
-## Development
-
-To run in development mode:
-
-### Server
-```bash
-cd server
-npm install
-npm run dev
-```
-
-### Client
-```bash
-cd client
-npm install
-npm run dev
-```
-
-## Docker Commands
-
-- Build and start all services: `docker-compose up --build`
-- Start services in background: `docker-compose up -d`
-- Stop services: `docker-compose down`
-- View logs: `docker-compose logs`
-- Rebuild specific service: `docker-compose build server`
-
-## Architecture
-
-- **Client**: React app built with Vite, served by Nginx
-- **Server**: Node.js Express API with Mongoose ODM
-- **Database**: MongoDB for data persistence
-- **Networking**: All services communicate through a Docker bridge network
-=======
-# CA2-507-508
->>>>>>> 608717e (Initial commit)
+>>>>>>> 9167dc4 (Update README.md)
