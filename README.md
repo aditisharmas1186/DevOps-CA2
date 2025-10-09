@@ -22,11 +22,6 @@ The system is built using **Node.js, MongoDB, Docker, Kubernetes, Prometheus, Gr
 
 ---
 
-## Project Architecture  
-
-![Architecture Diagram](docs/architecture.png)  
-> *System flow showing how users interact with the frontend, backend, and monitoring stack.*
-
 ### Key Components
 | Component | Description |
 |------------|--------------|
