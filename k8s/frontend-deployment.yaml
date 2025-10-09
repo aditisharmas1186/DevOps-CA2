@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: ehr-frontend
-          image: madhuraaher0547/ehr-frontend:latest   # 👈 use your Docker Hub image name
+          image: madhuraaher0547/ehr-frontend:latest
           ports:
             - containerPort: 80

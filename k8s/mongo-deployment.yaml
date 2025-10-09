@@ -1,20 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-deployment
+  name: mongo
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: ehr-backend
+      app: mongo
   template:
     metadata:
       labels:
-        app: ehr-backend
+        app: mongo
     spec:
       containers:
-        - name: backend
-          image: yourhubuser/ehr-backend:latest
+        - name: mongo
+          image: mongo:latest
           ports:
-            - containerPort: 5000
-          imagePullPolicy: Always
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      volumes:
+        - name: mongo-data
+          emptyDir: {}
