@@ -4,8 +4,8 @@
 ---
 
 ## Overview  
-This project implements a **cloud-native Electronic Health Record (EHR)** system that securely manages patient data and appointments.  
-The system is built using **Node.js, MongoDB, Docker, Kubernetes, Prometheus, Grafana, Ansible, and GitHub Actions**, showcasing a full DevOps lifecycle — from CI/CD to infrastructure automation and monitoring.
+This project implements a **cloud-native Electronic Health Record (EHR)** is a cloud-native healthcare application designed to digitize and streamline patient data management. System that securely manages patient data and appointments.  
+The project demonstrates the implementation of a complete DevOps lifecycle using modern technologies such as Node.js, MongoDB, Docker, Kubernetes, Ansible, Prometheus, Grafana, and GitHub Actions. Through containerization, automation, orchestration, and monitoring, the system ensures reliability, scalability, and efficient deployment. This project not only highlights technical integration but also emphasizes the importance of automation and observability in healthcare IT solutions.
 
 ---
 
