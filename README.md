@@ -1,16 +1,15 @@
-
-# 🏥 Electronic Health Record (EHR) System  
+ # Electronic Health Record (EHR) System  
 *A Containerized, Monitored, and Automated Healthcare Application*
 
 ---
 
-## 📖 Overview  
+## Overview  
 This project implements a **cloud-native Electronic Health Record (EHR)** system that securely manages patient data and appointments.  
 The system is built using **Node.js, MongoDB, Docker, Kubernetes, Prometheus, Grafana, Ansible, and GitHub Actions**, showcasing a full DevOps lifecycle — from CI/CD to infrastructure automation and monitoring.
 
 ---
 
-## 🚀 Features  
+## Features  
 
 - **Frontend (EHR Web UI)** – Built with HTML/CSS/JS, accessible via NodePort service.  
 - **Backend (Express.js API)** – Handles patient and appointment data with REST APIs.  
@@ -23,12 +22,12 @@ The system is built using **Node.js, MongoDB, Docker, Kubernetes, Prometheus, Gr
 
 ---
 
-## 🧱 Project Architecture  
+## Project Architecture  
 
 ![Architecture Diagram](docs/architecture.png)  
 > *System flow showing how users interact with the frontend, backend, and monitoring stack.*
 
-### 🔹 Key Components
+### Key Components
 | Component | Description |
 |------------|--------------|
 | **Frontend Service** | User interface for patient and appointment management |
@@ -41,7 +40,7 @@ The system is built using **Node.js, MongoDB, Docker, Kubernetes, Prometheus, Gr
 
 ---
 
-## ⚙️ Tech Stack  
+## Tech Stack  
 
 | Category | Technologies |
 |-----------|---------------|
@@ -57,6 +56,52 @@ The system is built using **Node.js, MongoDB, Docker, Kubernetes, Prometheus, Gr
 
 ---
 
-## 🧩 Project Structure  
+## Setup and Deployment  
+
+### 1. Clone the Repository
+git clone https://github.com/🟩your-username/CA2-507-508.git
+cd CA2-507-508
+
+### 2. Build and Push Docker Images 
+docker build -t madhuraaher0547/ehr-backend:latest ./backend
+docker build -t madhuraaher0547/ehr-frontend:latest ./frontend
+docker push madhuraaher0547/ehr-backend:latest
+docker push madhuraaher0547/ehr-frontend:latest
+
+### 3. Deploy to Kubernetes
+kubectl apply -f k8s/
+
+### 4. Deploy to Kubernetes
+kubectl apply -f monitoring/
+
+### 5. Access Services
+| Service         | URL                                              |
+| --------------- | ------------------------------------------------ |
+| **Frontend UI** | [http://localhost:30080](http://localhost:30080) |
+| **Prometheus**  | [http://localhost:30900](http://localhost:30900) |
+| **Grafana**     | [http://localhost:32000](http://localhost:32000) |
+
+### 6. Monitoring Overview
+Prometheus
+
+Collects metrics from /metrics endpoint of backend.
+Target Job: ehr-backend-service.default.svc.cluster.local:5000
+
+Grafana
+Visualizes metrics such as:
+CPU Usage
+Memory Usage
+HTTP Request Count
+Uptime and Response Time
+
+### 6. Automation
+Ansible
+Used to install Docker, clone repo, and run containers automatically.
+ansible-playbook -i inventory.ini playbook.yml --ask-become-pass
+
+### 6. GitHub Actions
+Workflow .github/workflows/docker.yml builds and pushes Docker images to Docker Hub whenever code is pushed to main.
+
+ 
 
 >>>>>>> 9167dc4 (Update README.md)
