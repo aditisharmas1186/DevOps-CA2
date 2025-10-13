@@ -1,0 +1,36 @@
+- name: Setup VitalHealth Runtime Environment
+  hosts: local
+  become: yes
+  tasks:
+
+    - name: Update apt packages
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+        state: present
+
+    - name: Create project directory
+      file:
+        path: /home/aiden/vitalhealth
+        state: directory
+
+    - name: Copy project files
+      copy:
+        src: /mnt/c/Users/Aiden/Desktop/vitalhealth/
+        dest: /home/aiden/vitalhealth
+        owner: "aiden"
+        group: "aiden"
+        mode: 0755
+
+    - name: Create Python virtual environment
+      command: python3 -m venv /home/aiden/vitalhealth/venv
+
+    - name: Install Python dependencies inside venv
+      command: /home/aiden/vitalhealth/venv/bin/pip install -r /home/aiden/vitalhealth/requirements.txt
+      
