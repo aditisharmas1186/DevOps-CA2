@@ -1,31 +1,56 @@
-# Use Node.js base image
-FROM node:18
+# Builder stage
+FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy root package files and install root deps
+# Install build dependencies (including bash)
+RUN apk add --no-cache python3 make g++ curl bash
+
+# Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-# Copy backend package files and install backend deps
-COPY server/package*.json ./server/
-RUN cd server && npm install
+# Copy and prepare build script
+COPY build.sh ./
+RUN chmod +x build.sh
 
-# Copy the rest of the project (frontend + backend)
+# Copy all source files
 COPY . .
 
-# Expose both frontend (5173) and backend (5000) ports
-EXPOSE 5173 5000
+# Run the build script (which generates start.sh & healthcheck.sh)
+RUN /bin/bash build.sh
 
-# Default command: run both frontend and backend
-CMD ["npm", "run", "dev"]
+# Production stage
+FROM node:20-alpine
 
+WORKDIR /app
 
-# docker build -t businesslens/fullstack:latest -f Dockerfile .
-# docker run -p 5173:5173 -p 5000:5000 -d --name businesslens-fullstack --env-file ./server/.env businesslens/fullstack:latest
+# Install production dependencies
+COPY package*.json ./
+RUN npm ci --production
 
-# Push to Docker Hub
-# docker tag businesslens/fullstack:latest abhi25022004/businesslens-fullstack:latest
-# docker push abhi25022004/businesslens-fullstack:latest
+# Copy built artifacts from builder
+COPY --from=builder /app/client/dist ./client/dist
+COPY --from=builder /app/server/dist ./server/dist
 
+# Copy generated startup and healthcheck scripts
+COPY --from=builder /app/start.sh ./
+COPY --from=builder /app/healthcheck.sh ./
+RUN chmod +x start.sh healthcheck.sh
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=5000
+
+# Expose application port
+EXPOSE 5000
+
+# Define health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD /app/healthcheck.sh
+
+# Launch application
+CMD ["/app/start.sh"]

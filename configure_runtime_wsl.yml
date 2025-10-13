@@ -1,0 +1,96 @@
+---
+- name: Configure PathoScanAI runtime (WSL / local)
+  hosts: local
+  become: true
+  vars:
+    app_user: pathoscan
+    app_home: /opt/PathoScanAI
+    repo_url: "https://github.com/shreyastambe103/PathoScanAI.git"
+    venv_path: "{{ app_home }}/venv"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required system packages
+      apt:
+        name:
+          - git
+          - python3
+          - python3-venv
+          - python3-pip
+          - build-essential
+          - libglib2.0-0
+          - libsm6
+          - libxext6
+          - libxrender1
+        state: present
+        update_cache: yes
+
+    - name: Ensure app user exists
+      user:
+        name: "{{ app_user }}"
+        comment: "PathoScan app user"
+        createhome: yes
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+
+    - name: Create app directory
+      file:
+        path: "{{ app_home }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+
+    - #name: Clone PathoScanAI repo
+      #git:
+       # repo: "{{ repo_url }}"
+       #dest: "{{ app_home }}"
+        #version: main
+        #force: yes
+        #update: yes
+
+    - name: Fix ownership of app directory
+      file:
+        path: "{{ app_home }}"
+        state: directory
+        recurse: yes
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+
+    - name: Ensure python venv exists
+      command: python3 -m venv "{{ venv_path }}"
+      args:
+        creates: "{{ venv_path }}/bin/activate"
+
+    - name: Check for requirements.txt
+      stat:
+        path: "{{ app_home }}/requirements.txt"
+      register: reqtxt
+
+    - name: Install Python requirements into venv (if requirements exists)
+      ansible.builtin.pip:
+        requirements: "{{ app_home }}/requirements.txt"
+        virtualenv: "{{ venv_path }}"
+        virtualenv_python: python3
+      when: reqtxt.stat.exists
+
+    - name: Create .env from template
+      template:
+        src: ansible/templates/env.j2
+        dest: "{{ app_home }}/.env"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0640'
+
+    - name: Ensure logs directory exists
+      file:
+        path: "{{ app_home }}/logs"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'

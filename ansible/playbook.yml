@@ -1,0 +1,23 @@
+---
+- name: Configure runtime environment
+  hosts: local
+  become: yes
+  tasks:
+    - name: Install packages
+      apt:
+        name: 
+          - git
+          - nodejs
+          - npm
+        state: present
+        update_cache: yes
+
+    - name: Create user
+      user:
+        name: pathoscan
+        state: present
+
+    - name: Create directory
+      file:
+        path: /opt/PathoScanAI
+        state: directory
