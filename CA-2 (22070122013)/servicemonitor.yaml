@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vitalhealth-servicemonitor
+  # This label tells the Prometheus Operator to pay attention to this object
+  labels:
+    release: prometheus
+spec:
+  selector:
+    # This matches the label on your Service
+    matchLabels:
+      app: vitalhealth
+  endpoints:
+  - port: web # <-- This matches the port name from your Service
+    path: /metrics
+    interval: 15s

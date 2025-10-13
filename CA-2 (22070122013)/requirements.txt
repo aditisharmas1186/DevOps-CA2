@@ -1,0 +1,8 @@
+Flask==3.0.3
+gunicorn==22.0.0
+requests==2.32.3
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.2
+prometheus_flask_exporter==0.22.4
+

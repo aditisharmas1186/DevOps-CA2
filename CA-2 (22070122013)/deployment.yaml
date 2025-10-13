@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vitalhealth-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vitalhealth
+  template:
+    metadata:
+      labels:
+        app: vitalhealth
+    spec:
+      containers:
+      - name: vitalhealth
+        image: aidenpanvalkar/vitalhealth:metrics  # <-- updated tag
+        ports:
+        - containerPort: 5000
+

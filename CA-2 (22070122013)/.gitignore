@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Helm & Kubernetes Artifacts
+kube-prometheus-stack/
+*.tgz
+kubectl
+test.json
+
+# Local Configs
+inventory.ini
+
+# IDE files
+.vscode/
+.idea/
