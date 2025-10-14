@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentiment-deployment
+  labels:
+    app: sentiment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sentiment
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: sentiment
+    spec:
+      containers:
+        - name: sentiment
+          image: sentiment-app:v2          # Updated to v2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:                              # ← ADD THIS SECTION
+            - name: APP_VERSION
+              value: "v2"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
