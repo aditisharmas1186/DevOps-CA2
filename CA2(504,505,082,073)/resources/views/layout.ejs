@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SymbiEat</title>
+    <a href="/">
+      <link rel="icon" href="/img/symbi.ico" type="image/x-icon" />
+    </a>
+    <link rel="stylesheet" href="/css/app.css" />
+    <link rel="stylesheet" href="/css/notification.css" />
+    <script src="/resources-js/notification.js" defer></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Nunito+Sans:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Nunito Sans", sans-serif;
+        color: #333;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Cormorant Garamond", serif;
+        letter-spacing: 0.5px;
+      }
+      .nav-item {
+        position: relative;
+      }
+      .nav-item::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -4px;
+        left: 0;
+        background-color: #e8c547;
+        transition: width 0.3s ease;
+      }
+      .nav-item:hover::after {
+        width: 100%;
+      }
+      .hidden-text {
+        opacity: 0;
+        animation: fadeIn 1.5s forwards;
+      }
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+      .size {
+        background-color: #f5f5f5;
+        border: 1px solid #e8c547;
+        color: #1d3557;
+      }
+      .add-to-cart {
+        background-color: #1d3557;
+        color: white;
+        transition: all 0.3s ease;
+      }
+      .add-to-cart:hover {
+        background-color: #2a4a73;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+      .navbar-container {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+      .menu-card {
+        transition: all 0.3s ease;
+        border: 1px solid #eaeaea;
+      }
+      .menu-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+        border-color: #e8c547;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Navbar -->
+    <nav class="bg-[#1D3557] text-white">
+      <div class="navbar-container">
+        <div
+          class="container mx-auto flex flex-wrap items-center justify-between px-6 py-5"
+        >
+          <!-- Logo and Title -->
+          <div class="flex items-center space-x-3">
+            <div class="bg-[#] p-2 rounded-lg">
+              <a href="/">
+                <img src="/img/symbi.ico" alt="SymbiEat Logo" class="h-8 w-8" />
+              </a>
+            </div>
+            <a href="/">
+              <span class="text-2xl font-semibold text-white tracking-wide"
+                >SymbiEat</span
+              >
+            </a>
+          </div>
+
+          <!-- Menu Links -->
+          <div class="flex flex-wrap items-center space-x-8 mt-4 sm:mt-0">
+            <a
+              href="/#menu"
+              class="text-white font-medium text-base hover:text-[#E8C547] transition duration-300 nav-item"
+              >Menu</a
+            >
+            <a
+              href="/"
+              class="text-white font-medium text-base hover:text-[#E8C547] transition duration-300 nav-item"
+              >Offer</a
+            >
+
+            <% if(user){ %>
+            <form id="logout" action="/logout" method="POST">
+              <a
+                onclick="document.getElementById('logout').submit()"
+                href="#"
+                class="text-white font-medium text-base hover:text-[#E8C547] transition duration-300 nav-item"
+                >Logout</a
+              >
+            </form>
+
+            <%} else {%>
+            <a
+              href="/register"
+              class="text-white font-medium text-base hover:text-[#E8C547] transition duration-300 nav-item"
+              >Register</a
+            >
+            <a
+              href="/login"
+              class="text-white font-medium text-base hover:text-[#E8C547] transition duration-300 nav-item"
+              >Login</a
+            >
+            <% } %>
+
+            <a
+              href="/cart"
+              class="bg-[#] p-2 rounded-full hover:bg-[#] transition duration-300"
+            >
+              <div class="relative">
+                <img
+                  src="/img/cart.png"
+                  alt="cart"
+                  class="h-12 w-12 nav-item hover:rotate-12 transition-transform duration-300"
+                />
+                <!-- Small notification bubble -->
+                <div
+                  class="cartCounter absolute -top-1 -right-1 bg-[#E8C547] text-[#112240] text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-bounce"
+                >
+                  <%= typeof session !== 'undefined' && session.cart ?
+                  session.cart.totalQty : '0' %>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <%- body %>
+
+    <!-- Load Axios from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- JS -->
+    <script src="/resources-js/app.js" defer></script>
+  </body>
+</html>

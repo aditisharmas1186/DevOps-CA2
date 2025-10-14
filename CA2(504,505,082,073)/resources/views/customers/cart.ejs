@@ -1,0 +1,530 @@
+<section class="cart pt-4 bg-white" id="cartSection">
+  <div class="container mx-auto px-4">
+    <!-- Header -->
+    <div class="flex items-center border-b pb-3 relative mb-6">
+      <div class="relative">
+        <img
+          src="/img/cart.png"
+          alt="cart"
+          class="h-10 w-10 sm:h-12 sm:w-12 nav-item hover:rotate-12 transition-transform duration-300"
+        />
+      </div>
+      <h1 class="font-bold ml-2 sm:ml-4 text-xl sm:text-2xl md:text-3xl">
+        <% if (session && session.cart && session.cart.items &&
+        Object.keys(session.cart.items).length > 0) { %> Order Summary <% } else
+        { %> Your Cart <% } %>
+      </h1>
+      <% if (session && session.cart && session.cart.items &&
+      Object.keys(session.cart.items).length > 0) { %>
+      <div
+        class="ml-auto text-xs sm:text-sm bg-[#E8C547] px-2 sm:px-3 py-1 rounded-full text-[#112240] font-medium shadow-md animate-pulse"
+      >
+        <span class="inline-block animate-pulse">⏰</span> Ready in 15 mins
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-5">
+      <!-- Left column -->
+      <div
+        class="<% if (session && session.cart && session.cart.items && Object.keys(session.cart.items).length > 0) { %>lg:col-span-2<% } else { %>col-span-full<% } %> mb-5"
+      >
+        <div
+          class="pizza-list bg-[#112240] p-3 sm:p-4 rounded-xl shadow-md text-white relative overflow-hidden"
+        >
+          <!-- Decorative element -->
+          <div
+            class="absolute top-10 right-0 w-24 h-24 -rotate-45 -translate-y-12 translate-x-8 opacity-5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="white"
+              width="96"
+              height="96"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"
+              />
+            </svg>
+          </div>
+
+          <!-- Food items loop -->
+          <% if (session && session.cart && session.cart.items &&
+          Object.keys(session.cart.items).length > 0) { %> <%
+          Object.values(session.cart.items).forEach(function(foodItem) { %>
+          <div
+            class="foodItem-list flex items-center justify-between mt-2 gap-2 sm:gap-4 w-full p-2 hover:bg-[#1a2e50] rounded-lg transition-colors duration-200 group"
+          >
+            <!-- Image -->
+            <div
+              class="w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] rounded-full overflow-hidden shadow-xl border-4 border-[#F8F9FA] group-hover:border-[#E8C547] transition-colors duration-200"
+            >
+              <img
+                src="/img/<%= foodItem.item.image %>"
+                alt="SymbiChef cooking"
+                class="w-full h-full object-cover scale-125 group-hover:scale-150 transition-transform duration-300"
+              />
+            </div>
+
+            <!-- Name -->
+            <h1 class="font-bold text-sm sm:text-lg flex-1 ml-2 sm:ml-4">
+              <%= foodItem.item.name %><span class="text-sm">🌱</span>
+              <div class="text-xs text-gray-400 font-normal">
+                The "I have an exam tomorrow" power meal
+              </div>
+            </h1>
+
+            <!-- Qty & Price -->
+            <div class="text-right">
+              <div class="text-xs sm:text-sm">
+                Qty: <span class="font-semibold"><%= foodItem.qty %></span>
+              </div>
+              <div class="text-[#E8C547] font-bold text-sm sm:text-lg">
+                ₹<%= foodItem.item.price * foodItem.qty %>
+              </div>
+            </div>
+          </div>
+          <% }) %> <% } else { %>
+          <!-- ENHANCED EMPTY CART SECTION -->
+          <div class="empty-cart-container p-4 sm:p-6 text-center">
+            <!-- 3D Fridge Card -->
+            <div class="empty-fridge-card mx-auto max-w-md perspective">
+              <div
+                class="fridge-door relative bg-gradient-to-b from-gray-100 to-gray-300 rounded-2xl p-6 shadow-xl transform-style preserve-3d hover:rotate-y-15 transition-transform duration-500"
+              >
+                <div
+                  class="absolute right-4 top-1/2 transform -translate-y-1/2 w-3 h-24 bg-gray-400 rounded-full shadow-inner"
+                ></div>
+                <div
+                  class="fridge-content bg-white rounded-xl p-6 mt-4 shadow-inner min-h-[300px] flex flex-col items-center justify-center relative overflow-hidden"
+                >
+                  <div class="sad-face relative w-32 h-32">
+                    <div
+                      class="absolute w-2 h-2 bg-[#E8C547] rounded-full left-8 top-8 opacity-80"
+                    ></div>
+                    <div
+                      class="absolute w-2 h-2 bg-[#E8C547] rounded-full right-8 top-8 opacity-80"
+                    ></div>
+                    <div
+                      class="absolute w-16 h-2 bg-[#E8C547] rounded-full left-8 bottom-8 opacity-80 sad-mouth"
+                    ></div>
+                    <div
+                      class="absolute w-1 h-1 bg-[#E8C547] rounded-full left-6 top-6 opacity-60"
+                    ></div>
+                    <div
+                      class="absolute w-1 h-1 bg-[#E8C547] rounded-full right-6 top-6 opacity-60"
+                    ></div>
+                  </div>
+                  <h3 class="text-2xl font-bold text-gray-800 mt-4">
+                    Your Cart is Empty
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="mt-8 relative">
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-[#E8C547] to-[#F7B801] blur-xl opacity-30 rounded-full"
+              ></div>
+              <button
+                onclick="window.location.href='/'"
+                class="relative bg-gradient-to-r from-[#E8C547] to-[#F7B801] hover:from-[#F7B801] hover:to-[#E8C547] text-[#112240] font-bold py-3 px-8 rounded-full text-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              >
+                <span class="flex items-center justify-center">
+                  <span class="mr-2 text-2xl">🍔</span>
+                  Feed Me Now!
+                </span>
+              </button>
+            </div>
+
+            <!-- Floating food emojis with animation -->
+            <div
+              class="floating-food-container absolute inset-0 overflow-hidden pointer-events-none"
+            >
+              <div
+                class="floating-food"
+                style="--delay: 0s; --x: -30px; --y: -20px"
+              >
+                🍕
+              </div>
+              <div
+                class="floating-food"
+                style="--delay: 2s; --x: 30px; --y: -25px"
+              >
+                🍔
+              </div>
+              <div
+                class="floating-food"
+                style="--delay: 4s; --x: -20px; --y: -30px"
+              >
+                🍟
+              </div>
+              <div
+                class="floating-food"
+                style="--delay: 6s; --x: 25px; --y: -15px"
+              >
+                🌮
+              </div>
+              <div
+                class="floating-food"
+                style="--delay: 8s; --x: -25px; --y: -25px"
+              >
+                🍦
+              </div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Right column: Order summary - Only show when cart has items -->
+      <% if (session && session.cart && session.cart.items &&
+      Object.keys(session.cart.items).length > 0) { %>
+           <!-- Right column: Order summary -->
+           <div class="lg:col-span-1">
+            <div class="bg-[#F8F9FA] rounded-xl p-6 shadow-md">
+              <h2 class="font-bold text-xl text-[#112240] mb-4">Order Details</h2>
+    
+              <!-- Coupon -->
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Have a coupon?</label
+                >
+                <div class="flex">
+                  <input
+                    type="text"
+                    placeholder="Enter coupon code"
+                    class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#E8C547] focus:border-transparent"
+                  />
+                  <button
+                    class="bg-[#112240] text-white px-4 py-2 rounded-r-lg hover:bg-[#1a2e50] transition-colors duration-200"
+                  >
+                    Apply
+                  </button>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  Try "STUDENT10" for 10% off your first order!
+                </div>
+              </div>
+    
+              <hr class="my-4 border-dashed border-gray-300" />
+    
+              <!-- Breakdown -->
+              <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Subtotal</span>
+                  <span class="font-medium">₹440</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Delivery</span>
+                  <span class="font-medium">₹60</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Discount</span>
+                  <span class="font-medium text-green-600">-₹0</span>
+                </div>
+              </div>
+    
+              <hr class="my-4 border-gray-300" />
+    
+              <!-- Total -->
+              <div class="py-2 mb-1">
+                <span class="text-lg font-bold">Total:</span>
+                <span
+                  class="amount text-2xl font-bold text-[#112240] relative group"
+                >
+                  ₹<%= session.cart && session.cart.totalPrice ?
+                  session.cart.totalPrice : 0 %>
+                  <span
+                    class="absolute -top-4 -left-2 text-xs bg-[#E8C547] text-[#112240] px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                    Worth every rupee!
+                  </span>
+                  <div class="text-xs text-gray-500 mb-4">
+                    * Cheaper than your textbooks and tastier too!
+                  </div>
+                </span>
+              </div>
+    
+              <!-- Confirm Button -->
+               <% if (user) { %>
+        <div>
+                <form action="/orders" method="POST"> 
+                <a href="/login">
+                <button
+                class="w-full bg-[#112240] hover:bg-[#1a2e50] text-white font-bold py-3 rounded-lg transition-colors duration-300 relative overflow-hidden group"
+              >
+                <span class="relative z-10 flex items-center justify-center">
+                  <span class="mr-2">🚀</span>
+                  Confirm Order & Fuel Your Brain
+                  <!-- main order button -->
+    
+                </span>
+                <span
+                  class="absolute inset-0 bg-[#E8C547] transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                ></span>
+                <span
+                  class="absolute inset-0 bg-[#E8C547] opacity-20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"
+                ></span>
+              </button>
+            </a>
+            </form>
+          </div>
+          <%} else{%>
+            <a href="/login">
+           <button
+                class="w-full bg-[#112240] hover:bg-[#1a2e50] text-white font-bold py-3 rounded-lg transition-colors duration-300 relative overflow-hidden group"
+              >
+                <span class="relative z-10 flex items-center justify-center">
+                  <span class="mr-2">🚀</span>
+                  Login to order !
+    
+                </span>
+                <span
+                  class="absolute inset-0 bg-[#E8C547] transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                ></span>
+                <span
+                  class="absolute inset-0 bg-[#E8C547] opacity-20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"
+                ></span>
+              </button>
+            </a>
+              <%}%>
+              
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- Add the empty cart script and styles at the end of the body -->
+<style>
+  /* 3D Fridge Card Styles */
+  .perspective {
+    perspective: 1000px;
+  }
+
+  .transform-style {
+    transform-style: preserve-3d;
+  }
+
+  .hover\:rotate-y-15:hover {
+    transform: rotateY(15deg);
+  }
+
+  /* Sad mouth animation */
+  @keyframes sadMouth {
+    0%,
+    100% {
+      transform: scaleX(1);
+    }
+    50% {
+      transform: scaleX(0.8);
+    }
+  }
+
+  .sad-mouth {
+    animation: sadMouth 3s ease-in-out infinite;
+  }
+
+  /* Brain fuel animation */
+  @keyframes pulseBrainFuel {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .brain-fuel-bar {
+    animation: pulseBrainFuel 2s ease-in-out infinite;
+  }
+
+  /* Floating food animation */
+  @keyframes floatingFood {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(var(--x), var(--y));
+    }
+  }
+
+  .floating-food {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.3;
+    animation: floatingFood 8s ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+
+  .floating-food:nth-child(1) {
+    top: 10%;
+    left: 10%;
+  }
+  .floating-food:nth-child(2) {
+    top: 20%;
+    right: 15%;
+  }
+  .floating-food:nth-child(3) {
+    bottom: 30%;
+    left: 20%;
+  }
+  .floating-food:nth-child(4) {
+    bottom: 20%;
+    right: 10%;
+  }
+  .floating-food:nth-child(5) {
+    top: 50%;
+    left: 50%;
+  }
+
+  /* Hours counter animation */
+  @keyframes countUp {
+    0% {
+      opacity: 0.7;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.7;
+    }
+  }
+
+  .hours-counter {
+    animation: countUp 1s linear infinite;
+  }
+
+  /* Hunger quotes fade animation */
+  @keyframes fadeQuote {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    90% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+
+  .hunger-quote {
+    animation: fadeQuote 10s ease-in-out infinite;
+  }
+</style>
+
+<script>
+  // Only run this script if the cart is empty
+  document.addEventListener("DOMContentLoaded", function () {
+    const emptyCartContainer = document.querySelector(".empty-cart-container");
+
+    if (emptyCartContainer) {
+      // Array of hunger quotes
+      const hungerQuotes = [
+        "Your stomach is so empty, it's starting to digest your life choices.",
+        "This cart is emptier than your DMs and your soul combined.",
+        "Your stomach just Googled: 'How to survive without friends or food.'",
+        "You scroll food, but eat regret. Relatable?",
+        "Your stomach wrote a suicide note. It's been ignored too long.",
+        "This cart is as abandoned as your childhood dreams.",
+        "Your stomach filed a missing person report on food.",
+        "Even your attendance has more in it than this cart.",
+        "Food isn't the only thing you've been ghosted by.",
+        "Your life's loading screen is stuck on 'Hunger'.",
+      ];
+
+      // Brain fuel messages
+      const brainFuelMessages = [
+        "CRITICAL: Your brain cells are filing for unemployment.",
+        "WARNING: Academic performance rapidly declining.",
+        "ALERT: You're one hunger pang away from eating your notes.",
+        "DANGER: Stomach now louder than lecture hall.",
+      ];
+
+      // Hunger levels
+      const hungerLevels = ["HIGH", "EXTREME", "CRITICAL", "HANGRY AF"];
+
+      // Update hunger quote
+      function updateHungerQuote() {
+        const quoteElement = document.querySelector(".hunger-quote");
+        if (quoteElement) {
+          const randomQuote =
+            hungerQuotes[Math.floor(Math.random() * hungerQuotes.length)];
+          quoteElement.textContent = randomQuote;
+        }
+      }
+
+      // Update brain fuel message
+      function updateBrainFuel() {
+        const messageElement = document.querySelector(".brain-fuel-message");
+        const barElement = document.querySelector(".brain-fuel-bar");
+        const percentElement = document.getElementById("brainFuelPercent");
+
+        if (messageElement && barElement && percentElement) {
+          const randomMessage =
+            brainFuelMessages[
+              Math.floor(Math.random() * brainFuelMessages.length)
+            ];
+          const randomPercent = Math.floor(Math.random() * 20) + 5; // 5-25%
+
+          messageElement.textContent = randomMessage;
+          barElement.style.width = `${randomPercent}%`;
+          percentElement.textContent = `${randomPercent}%`;
+        }
+      }
+
+      // Update hunger level
+      function updateHungerLevel() {
+        const levelElement = document.querySelector(".hunger-level");
+        if (levelElement) {
+          const randomLevel =
+            hungerLevels[Math.floor(Math.random() * hungerLevels.length)];
+          levelElement.textContent = randomLevel;
+        }
+      }
+
+      // Update hours counter
+      function updateHoursCounter() {
+        const counterElement = document.querySelector(".hours-counter");
+        if (counterElement) {
+          const hours = Math.floor(Math.random() * 12) + 6;
+          const minutes = Math.floor(Math.random() * 60);
+          const seconds = Math.floor(Math.random() * 60);
+
+          counterElement.textContent = `${hours
+            .toString()
+            .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
+            .toString()
+            .padStart(2, "0")}`;
+        }
+      }
+
+      // Initial updates
+      updateHungerQuote();
+      updateBrainFuel();
+      updateHungerLevel();
+      updateHoursCounter();
+
+      // Set intervals for updates
+      setInterval(updateHungerQuote, 10000); // Every 10 seconds
+      setInterval(updateBrainFuel, 7000); // Every 7 seconds
+      setInterval(updateHungerLevel, 5000); // Every 5 seconds
+      setInterval(updateHoursCounter, 1000); // Every second
+    }
+  });
+</script>
