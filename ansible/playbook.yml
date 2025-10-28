@@ -1,0 +1,37 @@
+---
+- name: Configure environment for EHR
+  hosts: localhost
+  become: yes
+  connection: local
+
+  tasks:
+    - name: Update package index
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install Docker Compose manually (works on macOS/Linux)
+      become: yes
+      shell: |
+        COMPOSE_VERSION=1.29.2
+        SYSTEM=$(uname -s)
+        ARCH=$(uname -m)
+        curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-${SYSTEM}-${ARCH}" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+
+    - name: Clone project repository
+      git:
+        repo: "https://github.com/Madhura777/CA2-507-508.git"
+        dest: "~/novena3"
+        version: main
+
+    - name: Start Docker Compose
+      command: docker-compose up -d
+      args:
+        chdir: "~/novena3"
