@@ -1,0 +1,19 @@
+---
+- name: Configure React Project Environment
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Ensure Node.js and npm are available
+      win_shell: |
+        node -v
+        npm -v
+
+    - name: Install dependencies
+      win_shell: npm install
+      args:
+        chdir: C:\Users\Sam\Desktop\DevOpsCAOne\New folder\medical-website-main\medical-website-main
+
+    - name: Build project
+      win_shell: npm run build
+      args:
+        chdir: C:\Users\Sam\Desktop\DevOpsCAOne\New folder\medical-website-main\medical-website-main
