@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes-goapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notes-goapp
+  template:
+    metadata:
+      labels:
+        app: notes-goapp
+    spec:
+      containers:
+      - name: goapp
+        image: nimahe/pitchhaven-backend:latest   # Use your Docker Hub image
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notes-goapp-service
+spec:
+  selector:
+    app: notes-goapp
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: NodePort

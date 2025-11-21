@@ -1,0 +1,28 @@
+---
+- name: Minimal DevOps Setup for PitchHaven
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Ensure 'htop' is installed
+      apt:
+        name: htop
+        state: present
+        update_cache: yes
+
+    - name: Create a new user 'pitchdev'
+      user:
+        name: pitchdev
+        state: present
+        shell: /bin/bash
+
+    - name: Create a test directory
+      file:
+        path: /home/nimahe/pitchhaven_test
+        state: directory
+        mode: '0755'
+
+    - name: Create a test file
+      copy:
+        dest: /home/nimahe/pitchhaven_test/readme.txt
+        content: "This is a test file created by Ansible"
+
