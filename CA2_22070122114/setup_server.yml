@@ -1,0 +1,20 @@
+---
+- name: Configure Web Server Node
+  hosts: webservers
+  become: yes # This means 'run as sudo'
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required system packages
+      apt:
+        name: ["docker.io", "python3-pip"]
+        state: present
+
+    - name: Ensure Docker service is running and enabled
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
